@@ -1,0 +1,93 @@
+Parts List:
+
+Raspberry Pi (any model)
+We will be using a Raspberry Pi Zero (https://lmg.gg/8KV3n) - $5
+You can optionally install Pi-Hole in a docker container, or inside a VM, but we will be assuming you are using a Raspi for the rest of this tutorial.
+Micro SD Card (2gb+, but you should probably just buy a 16GB card because they're so cheap)
+We'd recommend a cheap SanDisk card (https://lmg.gg/8KV3k)
+2.5A Micro USB AC Power Supply
+You can get these really cheap on eBay, but we aren't making any promises about quality. AdaFruit has a solid one: https://lmg.gg/8KVm8
+*Optional*: Micro USB to RJ45 Ethernet Adapter
+This is in case the RasPi you are using doesn't have an ethernet port or WiFi (if you're using the Pi Zero, you will need one of these)
+*Optional*: Other stuff that you might need:
+SD/uSD Card Reader (Unless your laptop, or you already has one)
+Ethernet Cable (Unless you're using WiFi, you will need one of these)
+Case for your Raspberry Pi Model (Nice to have to keep it protected, but cardboard also works)
+Heat sinks for your Raspberry Pi (Nice to have to keep it cool, also helpful if you want to overclock your Pi)
+A display connection for your Pi (Pi Zero's use Mini HDMI) (We will be doing a headless install, so this is not necessary)
+ 
+
+Stage 1 - OS Install/Setup:
+
+Before we can install Pi-Hole or anything else really, we have to setup our operating system of choice: Raspbian Buster Lite (stretch also works)
+Download and unzip the "Raspbian Buster Lite" image from the Raspbian website: https://www.raspberrypi.org/downloads/raspbian/
+Download and install balenaEtcher, our uSD card writer/burner of choice: https://www.balena.io/etcher/
+Plug in your uSD card
+Launch balenaEtcher, select the Raspbian Buster Lite image, your uSD card, and then click Flash. (https://xq.ms/lD5H3)
+If you're doing a headless install like us (no monitor/keyboard required), you'll need to enable SSH before booting up the Raspberry Pi
+Replug your uSD card to allow Windows to recognize the new Raspbian partition layout
+You should have a lettered drive pop up marked as "boot" (https://xq.ms/HSnr3)
+If you don't, ensure your uSD is being detected in Disk Management (https://xq.ms/KeYFL)
+Then assign the partition a drive letter: https://lmg.gg/8KVm6
+Create a file inside the "boot" folder called "ssh" with no extension (https://xq.ms/sOiok)
+If you don't know how to make an extension-less file you can download it here: https://lmg.gg/8KVmb
+Plug your uSD card into the Raspberry Pi followed by networking, and then power.
+Since we're doing a headless install, we'll need to search for our raspberrypi's IP address so we can access it over SSH.
+If you know what you're doing, log in to your router's admin page and check the DHCP client/reservation list for "raspberrypi"
+If you don't know how to do the above, download Angry IP scanner and run it: https://lmg.gg/8KVmS
+Look for the hostname "raspberrypi", on that line the IP and MAC address of our Raspberry Pi will also be listed: 10.20.0.77 in our case (https://xq.ms/xmRO6)
+Now that we've found our Raspberry Pi's IP address + MAC Address, we need to assign it an INTERNAL/LOCAL static IP address.
+This process is going to vary wildly based on which router/DHCP server you use, so we'd recommend Googling your router's model name/number (can be found on the back) + "how to set static IP" (ex: "Netgear R7000 how to set static ip").
+If you're willing and somewhat tech savvy, you might also be able to figure it out on your own.
+Start by navigating to your router's admin page. The IP for this is typically located on a sticker on the back of your ISP's provided router (along with the admin page's default username and password), but you can also find it by running the command "ipconfig" in command prompt on a Windows PC. Your router's IP will be listed after "default gateway" (https://xq.ms/Ss5r8)
+Log in to the admin page either with the Iogin credentials listed on the back of the router, or by googling the model number of the router along with "default password". Some routers use a randomly generated default password, so googling will not work for those.
+Once logged in, look for a tab labeled "DHCP Reservation", "Static IP Assignment", or something along those lines. (https://xq.ms/usUSm) You may have to go to the Advanced menu to access this. (https://xq.ms/Iiakq)
+Enter the MAC address we grabbed earlier with Angry IP scanner, and then enter/select your desired static IP address (make sure you're using something not taken by another device on your network). (https://xq.ms/093f5)
+Hit Apply (or whatever the equivalent is for your router) 
+Re-plug the power connection for your Raspberry Pi, to allow it to restart and fetch it's newly assigned IP.
+To access the Raspberry Pi over SSH we will need to download and connect to it with an SSH client
+Download, install and then launch the SSH client of your choice.
+We will be using PuTTY because it's simple, but any SSH client will do: https://lmg.gg/8KVmQ (https://xq.ms/o1MmW)
+Enter the newly assigned static IP address of your Raspberry Pi into PuTTY, and click "Open" (https://xq.ms/RenX0)
+After it prompts you with "login as:" enter "pi" (https://xq.ms/RaB85)
+Then for password, enter "raspberry". You should now be logged in over SSH. :D (https://xq.ms/bOTSr)
+Now that we're logged in over SSH, start by changing the default password, and updating the Raspberry Pi.
+To change the user password enter the command "passwd" and press enter.
+You'll then be prompted to enter the current password (this is "raspberry" so enter that)
+Then enter your desired new password
+To update the Raspberry Pi, run the command "sudo apt update" - this is going to update the package list to tell us if anything needs to be update. (https://xq.ms/arykN)
+Then, to actually upgrade the packages now that the package manager knows which ones need updating, run "sudo apt upgrade -y". (https://xq.ms/jglHA)
+Our Raspberry Pi is now updated, set to a secure password and ready to install Pi-Hole onto! :D
+ 
+
+Stage 2 - Pi-Hole Install/Setup (this is where the tutorial portion in the video starts)
+
+With our RasPi's OS, internet, and SSH ready to go, we can now install Pi-Hole. 
+Copy the Pi-Hole install command from their website, paste it into the SSH client, and click Enter to run it: https://lmg.gg/8KVm9 (https://xq.ms/Nc2OU)
+The installer will spit out some status updates until you're brought to the configuration screen (https://xq.ms/n3CMi)
+Press Enter until you get to the "Choose An Interface" page. The default "eth0" interface for Ethernet users should be selected by default. Press Enter to continue.
+("wlan0" should be selected if you're using WiFI - keep in mind WiFi installation is not supported in this tutorial, but if you have some decent Google-Fu you should be able to figure it out)
+On the next screen, select your upstream DNS provider. This is where requests will be forwarded if they're not blocked by Pi-Hole (ie. if they're not found in it's block/black lists). We will be using Google DNS, and if you don't know what this means, stick with that. Press Enter to continue.
+The following screen allows you to select which of the default block list's you'd like to use. We will leave these all on, but you can use your arrow keys and space bar to (de)select any of them as you wish. Press Enter to continue.
+Next up, it will ask you if which IP protocols you want to block ads over, leave this at the default unless you know what you're doing. Press Enter to continue.
+The next screen will list the IP address of the Raspberry Pi and the IP of your router, assuming you've set a static IP, just click Enter to continue.
+If you get a screen about an IP conflict, just ignore it and click Enter to continue.
+You'll then be asked about the web interface, web server, and logging modes. Leave these all at default by clicking Enter.
+After all that, Pi-Hole is going to do a bunch of stuff, and it might take a couple minutes so sit back until you're greeted with an "Installation Complete!" page. This will list the IP and password for the Pi-Hole web interface.
+Copy the IP into your browser, and log with the listed password. Huzzah! You now have a functioning Pi-Hole installation :D 
+ 
+
+Stage 3 - Setting Up Pi-Hole to Run on Your Devices / Whole Network
+
+To enable Pi-Hole on a device-by-device basis, you'll need to manually set the DNS IP address in your device settings. 
+For each of these, substitute the IP in the tutorial for the IP of your Raspberry Pi
+How to set DNS on an iPhone: https://lmg.gg/8KVmw
+How to set DNS on Android phones (your phone manufacturers skin may slightly vary): https://lmg.gg/8KVmh
+To enable Pi-Hole on a Router level, meaning it will work on all your devices automatically, you'll need to configure your router's DHCP server's default DNS settings.
+This process is going to vary wildly based on which router/DHCP server you use, so we'd recommend Googling your router's model name/number (can be found on the back) + "how to set DNS servers" (ex: "Netgear R7000 how to set DNS servers").
+ 
+
+Stage 4 - Using Pi-Hole + Common Whitelisting
+
+To enable some common whitelisted false-positives run the command listed here: https://github.com/anudeepND/whitelist
+For some great info on the Pi-Hole web interface read the lower portion of this tutorial: https://www.smarthomebeginner.com/pi-hole-tutorial-whole-home-ad-blocking/#Configuring_Your_Router_8211_Whole_Home_Ad_Blocking 
